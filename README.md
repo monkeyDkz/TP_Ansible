@@ -35,14 +35,11 @@ npm install
 
 ### 3. MongoDB Setup
 
-- Open MongoDB Compass
-- Create a new database named `Todo`
-- Inside the `Todo` database, create a collection named `tasks`
 
 ### 4. Server setup for database connection
 
 ```bash
-PORT=5000  # Port number for the server (you can change it if needed)
+PORT=5001  # Port number for the server (you can change it if needed)
 MONGO_URI=mongodb://127.0.0.1:27017/Todo  # MongoDB connection URI
 ```
 
@@ -56,7 +53,7 @@ npm start
 npm start
 ```
 
-The server will run on `http://localhost:5000` and the client on `http://localhost:3000`.
+The server will run on `http://localhost:5001` and the client on `http://localhost:3000`.
 
 ## Usage
 

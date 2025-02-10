@@ -1,0 +1,6 @@
+- name: "Install MongoDB"
+  ansible.builtin.apt:
+    name: mongodb
+    state: present
+  notify: ["Enable MongoDB", "Start MongoDB"]
+- name: "create user "

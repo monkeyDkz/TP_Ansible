@@ -1,0 +1,16 @@
+- name: "Restart MongoDB"
+  ansible.builtin.service:
+    name: "mongodb"
+    state: "restarted"
+- name: "Reload MongoDB"
+  ansible.builtin.service:
+    name: "mongodb"
+    state: "reloaded"
+- name: "Enable MongoDB"
+  ansible.builtin.service:
+    name: "mongodb"
+    enabled: true
+- name: "Start MongoDB"
+  ansible.builtin.service:
+    name: "mongodb"
+    state: "started"
