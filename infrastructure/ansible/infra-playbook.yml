@@ -1,76 +1,23 @@
+---
+- name: "Installation de l'infrastructure MERN"
+  hosts: all
+  become: no
 
-### Fichier `deploy.yml` pour Ansible
-- hosts: mern_app
-  become: yes
-  vars:
-    node_version: "14.x"
-    mongo_version: "4.4"
-  tasks:
-    - name: Update and upgrade apt packages
-      apt:
-        update_cache: yes
-        upgrade: dist
+  vars_files:
+    - vars.yml
 
-    - name: Install required packages
-      apt:
-        name:
-          - build-essential
-          - curl
-          - git
-          - nginx
-        state: present
+  pre_tasks:
+    - name: "Vérification de Docker"
+      community.docker.docker_host_info:
+        containers: yes
+      register: docker_info
 
-    - name: Install Node.js
-      shell: curl -sL https://deb.nodesource.com/setup_{{ node_version }} | bash -
-      args:
-        creates: /usr/bin/node
+    - name: "Affichage des informations Docker"
+      ansible.builtin.debug:
+        var: docker_info
 
-    - name: Install Node.js and npm
-      apt:
-        name: nodejs
-        state: present
-
-    - name: Install MongoDB
-      apt:
-        name: mongodb
-        state: present
-
-    # - name: Clone the repository
-    #   git:
-    #     repo: 'https://github.com/AtharvaKulkarniIT/mern-todo-app.git'
-    #     dest: /home/{{ ansible_user }}/mern-todo-app
-
-    - name: Install backend dependencies
-      npm:
-        path: /home/{{ ansible_user }}/mern-todo-app/app/todo_backend
-        state: present
-
-    - name: Install frontend dependencies
-      npm:
-        path: /home/{{ ansible_user }}/mern-todo-app/app/todo_frontend
-        state: present
-
-    - name: Start backend server
-      shell: |
-        cd /home/{{ ansible_user }}/mern-todo-app/app/todo_backend
-        npm start &
-      args:
-        executable: /bin/bash
-
-    - name: Start frontend server
-      shell: |
-        cd /home/{{ ansible_user }}/mern-todo-app/app/todo_frontend
-        npm start &
-      args:
-        executable: /bin/bash
-
-    - name: Create MongoDB database and collection
-      mongodb_db:
-        name: Todo
-        state: present
-
-    - name: Create tasks collection
-      mongodb_collection:
-        name: tasks
-        db: Todo
-        state: present
+  roles:
+    - { role: docker, tags: ['docker'] }
+    - { role: mongodb, tags: ['db'] }
+    - { role: nodejs, tags: ['app'] }
+    - { role: nginx, tags: ['web'] }

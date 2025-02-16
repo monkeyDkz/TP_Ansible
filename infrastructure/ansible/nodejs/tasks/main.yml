@@ -1,0 +1,22 @@
+---
+- name: "Configuration Backend"
+  block:
+    - name: "Build image backend"
+      community.docker.docker_image:
+        build:
+          path: "{{ app_directory }}/TODO/todo_backend"
+        name: "backend:latest"
+        source: build
+
+    - name: "Démarrage container backend"
+      community.docker.docker_container:
+        name: "{{ backend_container_name }}"
+        image: "backend:latest"
+        state: started
+        ports:
+          - "{{ backend_port }}:5001"
+        env:
+          MONGO_URI: "mongodb://{{ mongodb_container_name }}:27017/Todo"
+        networks:
+          - name: bridge  # Utilisation du réseau bridge par défaut
+        networks_cli_compatible: yes

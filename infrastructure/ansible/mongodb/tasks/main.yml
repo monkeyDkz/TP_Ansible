@@ -1,6 +1,15 @@
-- name: "Install MongoDB"
-  ansible.builtin.apt:
-    name: mongodb
-    state: present
-  notify: ["Enable MongoDB", "Start MongoDB"]
-- name: "create user "
+---
+- name: "Configuration MongoDB"
+  block:
+    - name: "Création du container MongoDB"
+      community.docker.docker_container:
+        name: "{{ mongodb_container_name }}"
+        image: "mongo:{{ mongodb_version }}"
+        state: started
+        ports:
+          - "{{ mongodb_port }}:27017"
+        volumes:
+          - "{{ mongodb_volume }}:/data/db"
+        networks:
+          - name: bridge  # Utiliser le réseau bridge par défaut en mode check
+        networks_cli_compatible: yes  # Assurer la compatibilité avec Docker CLI

@@ -1,0 +1,25 @@
+# Configuration globale
+app_name: mern-todo-app
+app_user: "{{ ansible_user }}"
+app_directory: "/Users/{{ ansible_user }}/{{ app_name }}"
+
+# Versions des services
+node_version: "18.x"
+mongodb_version: "4.4"
+
+# Configuration réseau
+domain_name: localhost
+backend_port: 5001
+mongodb_port: 27017
+
+# Configuration Docker
+docker_network: mern_network
+mongodb_container_name: mongodb
+backend_container_name: backend
+frontend_container_name: frontend
+mongodb_volume: mongodb_data
+mongodb_data_dir: /data/db
+
+# Configuration Git
+git_repo: "https://github.com/monkeyDkz/TP_Ansible.git"
+git_branch: "main"

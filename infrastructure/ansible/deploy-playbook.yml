@@ -1,0 +1,99 @@
+---
+- name: "Déploiement de l'application MERN"
+  hosts: all
+  become: no
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: "Vérification de Docker"
+      community.docker.docker_host_info:
+        containers: yes
+      register: docker_info
+
+  tasks:
+    - name: "Cloner le dépôt Git"
+      ansible.builtin.git:
+        repo: "{{ git_repo }}"
+        dest: "{{ app_directory }}"
+        version: "{{ git_branch }}"
+        force: yes
+      tags: ['clone']
+
+    - name: "Construction des images Docker"
+      block:
+        - name: "Build image backend"
+          community.docker.docker_image:
+            build:
+              path: "{{ app_directory }}/TODO/todo_backend"
+            name: "backend:latest"
+            source: build
+            force_source: yes
+          tags: ['build', 'backend']
+
+        - name: "Build image frontend"
+          community.docker.docker_image:
+            build:
+              path: "{{ app_directory }}/TODO/todo_frontend"
+            name: "frontend:latest"
+            source: build
+            force_source: yes
+          tags: ['build', 'frontend']
+
+    - name: "Démarrage des conteneurs"
+      block:
+        - name: "Démarrage MongoDB"
+          community.docker.docker_container:
+            name: "{{ mongodb_container_name }}"
+            image: "mongo:{{ mongodb_version }}"
+            state: started
+            ports:
+              - "{{ mongodb_port }}:27017"
+            volumes:
+              - "{{ mongodb_volume }}:/data/db"
+            networks:
+              - name: bridge
+            networks_cli_compatible: yes
+          tags: ['start', 'db']
+
+        - name: "Démarrage Backend"
+          community.docker.docker_container:
+            name: "{{ backend_container_name }}"
+            image: "backend:latest"
+            state: started
+            ports:
+              - "{{ backend_port }}:5001"
+            env:
+              MONGO_URI: "mongodb://{{ mongodb_container_name }}:27017/Todo"
+            networks:
+              - name: bridge
+            networks_cli_compatible: yes
+          tags: ['start', 'backend']
+
+        - name: "Démarrage Frontend"
+          community.docker.docker_container:
+            name: "{{ frontend_container_name }}"
+            image: "frontend:latest"
+            state: started
+            ports:
+              - "80:80"
+            networks:
+              - name: bridge
+            networks_cli_compatible: yes
+          tags: ['start', 'frontend']
+
+    - name: "Vérification des conteneurs"
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      register: container_info
+      with_items:
+        - "{{ mongodb_container_name }}"
+        - "{{ backend_container_name }}"
+        - "{{ frontend_container_name }}"
+      tags: ['check']
+
+    - name: "Affichage du statut"
+      ansible.builtin.debug:
+        var: container_info
+      tags: ['check']

@@ -1,0 +1,17 @@
+---
+- name: "Installation de Docker"
+  block:
+    # - name: "Installation de Docker Desktop"
+    #   community.general.homebrew_cask:
+    #     name: docker
+    #     state: present
+
+    - name: "Création du réseau Docker"
+      community.docker.docker_network:
+        name: "{{ docker_network }}"
+        state: present
+
+    - name: "Création du volume MongoDB"
+      community.docker.docker_volume:
+        name: "{{ mongodb_volume }}"
+        state: present

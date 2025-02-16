@@ -1,0 +1,20 @@
+---
+- name: "Configuration Nginx"
+  block:
+    - name: "Construction de l'image frontend"
+      community.docker.docker_image:
+        build:
+          path: "{{ app_directory }}/TODO/todo_frontend"
+        name: "frontend:latest"
+        source: build
+
+    - name: "Création du container frontend"
+      community.docker.docker_container:
+        name: "{{ frontend_container_name }}"
+        image: "frontend:latest"
+        state: started
+        ports:
+          - "80:80"
+        networks:
+          - name: bridge  # Utilisation du réseau bridge par défaut
+        networks_cli_compatible: yes

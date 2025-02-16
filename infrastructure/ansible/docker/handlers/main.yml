@@ -1,0 +1,15 @@
+---
+- name: "Deploy MERN"
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_directory }}"
+    files:
+      - docker-compose.yml
+    state: present
+
+- name: "Restart Docker"
+  ansible.builtin.command: killall Docker && open /Applications/Docker.app
+  when: ansible_os_family == "Darwin"
+
+- name: "Reload Docker"
+  ansible.builtin.command: docker system reload
+  when: ansible_os_family == "Darwin"

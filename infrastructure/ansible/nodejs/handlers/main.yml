@@ -1,0 +1,28 @@
+---
+- name: "Installation des dépendances Node.js"
+  ansible.builtin.apt:
+    name:
+      - curl
+      - software-properties-common
+    state: present
+    update_cache: true
+
+# - name: "Ajout du dépôt Node.js"
+#   ansible.builtin.shell: "curl -fsSL https://deb.nodesource.com/setup_{{ node_version }} | bash -"
+#   args:
+#     creates: /usr/bin/node
+
+- name: "Installation de Node.js"
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+  notify: Restart-nodejs
+
+- name: "Création du répertoire de l'application"
+  ansible.builtin.file:
+    path: "{{ app_directory }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0755"

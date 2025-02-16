@@ -1,16 +1,9 @@
-- name: "Restart MongoDB"
-  ansible.builtin.service:
-    name: "mongodb"
-    state: "restarted"
-- name: "Reload MongoDB"
-  ansible.builtin.service:
-    name: "mongodb"
-    state: "reloaded"
-- name: "Enable MongoDB"
-  ansible.builtin.service:
-    name: "mongodb"
-    enabled: true
+---
 - name: "Start MongoDB"
-  ansible.builtin.service:
-    name: "mongodb"
-    state: "started"
+  ansible.builtin.command: brew services start mongodb-community@{{ mongodb_version }}
+
+- name: "Enable MongoDB"
+  ansible.builtin.command: brew services start mongodb-community@{{ mongodb_version }}
+
+- name: "Restart MongoDB"
+  ansible.builtin.command: brew services restart mongodb-community@{{ mongodb_version }}
